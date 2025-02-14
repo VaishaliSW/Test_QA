@@ -1,89 +1,71 @@
-package com.care4today.tests;
+package com.example.tests;
 
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
-import org.openqa.selenium.By;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import com.example.pages.LoginPage;
+import com.example.pages.LoanApplicationPage;
+import com.example.pages.CreditScorePage;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+import java.time.Duration;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
-
-public class Care4TodayTests {
-
-    private AppiumDriver<MobileElement> driver;
-    private String platform = System.getProperty("platform", "Android");
-    private String deviceName = System.getProperty("deviceName", "emulator-5554");
-    private String appPath = System.getProperty("app", "path/to/your/app.apk");
-
-    @BeforeSuite
-    public void setupSuite() {
-        System.out.println("Setting up test suite");
-    }
-
-    @AfterSuite
-    public void teardownSuite() {
-        System.out.println("Tearing down test suite");
-    }
+public class LoanApplicationTests {
+    private WebDriver driver;
 
     @BeforeMethod
-    public void setupTest() throws MalformedURLException {
-        System.out.println("Setting up test case");
+    public void setUp() {
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+        driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+    }
 
-        DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setCapability(MobileCapabilityType.DEVICE_NAME, deviceName);
+    @Test
+    public void verifyChecklistFunctionality() {
+        driver.get("https://loan-application-system.com");
 
-        if (platform.equalsIgnoreCase("Android")) {
-            caps.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
-            caps.setCapability(MobileCapabilityType.APP, appPath);
-            driver = new AndroidDriver<>(new URL("http://localhost:4723/wd/hub"), caps);
-        } else if (platform.equalsIgnoreCase("iOS")) {
-            caps.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
-            caps.setCapability(MobileCapabilityType.APP, appPath);
-            driver = new IOSDriver<>(new URL("http://localhost:4723/wd/hub"), caps);
-        }
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.enterUsername("user123");
+        loginPage.enterPassword("abcabd");
+        loginPage.clickLogin();
 
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        LoanApplicationPage loanApplicationPage = new LoanApplicationPage(driver);
+        loanApplicationPage.navigateToLoanApplication();
+
+        Assert.assertTrue(loanApplicationPage.areDocumentsVerified(), "Documents are not verified");
+    }
+
+    @Test
+    public void confirmCreditScoreAbove500() {
+        driver.get("https://loan-application-system.com");
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.enterUsername("user123");
+        loginPage.enterPassword("abcabd");
+        loginPage.clickLogin();
+
+        LoanApplicationPage loanApplicationPage = new LoanApplicationPage(driver);
+        loanApplicationPage.navigateToLoanApplication();
+
+        CreditScorePage creditScorePage = loanApplicationPage.openCreditScoreReport();
+        creditScorePage.loginToCreditScore("user123", "abcabd");
+        creditScorePage.navigateToCreditScorePage();
+        creditScorePage.searchCustomerID("acb1243");
+
+        int creditScore = creditScorePage.getCreditScore();
+        Assert.assertTrue(creditScore > 500, "Credit score is not above 500");
+
+        creditScorePage.updateVerificationStatus();
+        creditScorePage.logout();
     }
 
     @AfterMethod
-    public void teardownTest() {
-        System.out.println("Tearing down test case");
+    public void tearDown() {
         if (driver != null) {
             driver.quit();
         }
-    }
-
-    @Test
-    public void testLoginFunctionality() {
-        System.out.println("Executing testLoginFunctionality");
-        MobileElement usernameField = driver.findElement(By.id("com.example:id/username"));
-        MobileElement passwordField = driver.findElement(By.id("com.example:id/password"));
-        MobileElement loginButton = driver.findElement(By.id("com.example:id/login_button"));
-
-        usernameField.sendKeys("testuser");
-        passwordField.sendKeys("password123");
-        loginButton.click();
-
-        MobileElement homeView = driver.findElement(By.id("com.example:id/home_view"));
-        Assert.assertTrue(homeView.isDisplayed(), "Login failed, home view not visible");
-    }
-
-    @Test
-    public void testLogoutFunctionality() {
-        System.out.println("Executing testLogoutFunctionality");
-        MobileElement profileButton = driver.findElement(By.id("com.example:id/profile_button"));
-        MobileElement logoutButton = driver.findElement(By.id("com.example:id/logout_button"));
-
-        profileButton.click();
-        logoutButton.click();
-
-        MobileElement loginView = driver.findElement(By.id("com.example:id/login_view"));
-        Assert.assertTrue(loginView.isDisplayed(), "Logout failed, login view not visible");
     }
 }
