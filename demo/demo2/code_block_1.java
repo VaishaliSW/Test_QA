@@ -1,32 +1,31 @@
 package com.example.tests;
 
-import com.example.pages.LoginPage;
-import com.example.pages.HomePage;
-import com.example.pages.CartPage;
-import com.example.pages.CheckoutPage;
-import com.example.utils.TestDataProvider;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
-public class PurchaseTest {
+import java.time.Duration;
+import java.util.Properties;
+
+public class RealTimeTrackingTest {
     private WebDriver driver;
-    private LoginPage loginPage;
-    private HomePage homePage;
-    private CartPage cartPage;
-    private CheckoutPage checkoutPage;
-
+    private Properties prop;
+    
     @BeforeMethod
     public void setUp() {
-        driver = new ChromeDriver();
+        System.setProperty("webdriver.chrome.driver", "/path/to/chromedriver");
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+        driver = new ChromeDriver(options);
         driver.manage().window().maximize();
-        driver.get("https://www.example.com/");
-        loginPage = new LoginPage(driver);
-        homePage = new HomePage(driver);
-        cartPage = new CartPage(driver);
-        checkoutPage = new CheckoutPage(driver);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
     }
 
     @AfterMethod
@@ -36,15 +35,39 @@ public class PurchaseTest {
         }
     }
 
-    @Test(dataProvider = "purchaseData", dataProviderClass = TestDataProvider.class)
-    public void testDiscountApplication(String username, String password, String discountCode, int expectedTotal) {
-        loginPage.login(username, password);
-        homePage.addBooksToCart(10);
-        cartPage.verifyTotalPrice(300);
-        cartPage.proceedToCheckout();
-        checkoutPage.applyDiscount(discountCode);
-        checkoutPage.verifyDiscountedPrice(expectedTotal);
-        checkoutPage.completePurchase();
-        checkoutPage.verifyOrderConfirmationEmail();
+    @DataProvider(name = "trackingData")
+    public Object[][] trackingData() {
+        return new Object[][]{
+            {"/tracking", "TRK1234567890", "In Transit, New York"},
+            {"/tracking", "TRK0987654321", "Out for Delivery, LA", "2023-10-15"},
+            {"/tracking", "TRK1122334455", "In Transit, Miami", "5 items"},
+            {"/tracking", "TRK9988776655", "In Customs, Tokyo", "Cleared"},
+            {"/tracking", "TRK6677889900", "In Transit, Chicago", "Handle with Care"}
+        };
+    }
+
+    @Test(dataProvider = "trackingData")
+    public void testRealTimeTracking(String url, String trackingNumber, String expectedStatus, String... additionalDetails) {
+        driver.get("https://www.example.com" + url);
+        
+        WebElement trackingNumberField = driver.findElement(By.id("trackingNumber"));
+        WebElement trackButton = driver.findElement(By.id("trackButton"));
+        
+        trackingNumberField.sendKeys(trackingNumber);
+        trackButton.click();
+        
+        WebElement statusElement = driver.findElement(By.id("status"));
+        String actualStatus = statusElement.getText();
+        
+        SoftAssert softAssert = new SoftAssert();
+        softAssert.assertEquals(actualStatus, expectedStatus, "Status mismatch");
+        
+        if (additionalDetails.length > 0) {
+            WebElement additionalDetailElement = driver.findElement(By.id("additionalDetail"));
+            String actualDetail = additionalDetailElement.getText();
+            softAssert.assertEquals(actualDetail, additionalDetails[0], "Additional detail mismatch");
+        }
+
+        softAssert.assertAll();
     }
 }
