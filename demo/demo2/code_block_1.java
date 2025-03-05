@@ -1,120 +1,119 @@
-package com.example.tests;
+package com.ecommerce.tests;
 
-import com.example.pages.LoginPage;
-import com.example.pages.RegistrationPage;
-import com.example.pages.VaccinationSchedulingPage;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.remote.MobileCapabilityType;
+import org.openqa.selenium.By;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.time.Duration;
-import java.util.Properties;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
-public class VaccinationTests {
-    private WebDriver driver;
-    private Properties prop;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
 
-    @BeforeMethod
-    public void setUp() throws IOException {
-        prop = new Properties();
-        FileInputStream fis = new FileInputStream("src/main/resources/config.properties");
-        prop.load(fis);
+public class ECommerceTests {
 
-        String browser = prop.getProperty("browser");
-        if (browser.equalsIgnoreCase("chrome")) {
-            driver = new ChromeDriver();
+    private AppiumDriver<MobileElement> driver;
+    private DesiredCapabilities capabilities = new DesiredCapabilities();
+    private String platform = System.getProperty("platform", "android"); // default to android
+
+    @BeforeClass
+    public void setup() throws MalformedURLException {
+        if (platform.equalsIgnoreCase("android")) {
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
+            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android Emulator");
+            capabilities.setCapability(MobileCapabilityType.APP, "path/to/android/app.apk");
+            driver = new AndroidDriver<>(new URL("http://localhost:4723/wd/hub"), capabilities);
+        } else if (platform.equalsIgnoreCase("ios")) {
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
+            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone Simulator");
+            capabilities.setCapability(MobileCapabilityType.APP, "path/to/ios/app.ipa");
+            driver = new IOSDriver<>(new URL("http://localhost:4723/wd/hub"), capabilities);
         }
-        driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
     }
 
-    @AfterMethod
-    public void tearDown() {
+    @DataProvider(name = "userData")
+    public Object[][] getUserData() throws IOException, CsvException {
+        CSVReader reader = new CSVReader(new FileReader("path/to/data.csv"));
+        return reader.readAll().toArray(new Object[0][]);
+    }
+
+    @Test(priority = 1)
+    public void testSelectiPhone15() {
+        MobileElement product = driver.findElement(By.xpath("//android.widget.TextView[@text='iPhone 15']"));
+        product.click();
+        MobileElement addToCart = driver.findElement(By.id("com.ecommerce.app:id/addToCartButton"));
+        addToCart.click();
+        MobileElement cartItem = driver.findElement(By.xpath("//android.widget.TextView[@text='iPhone 15']"));
+        Assert.assertNotNull(cartItem, "iPhone 15 should be added to the cart");
+    }
+
+    @Test(priority = 2, dataProvider = "userData")
+    public void testProvideDeliveryDetails(String name, String address, String pinCode) {
+        MobileElement nameField = driver.findElement(By.id("com.ecommerce.app:id/nameField"));
+        MobileElement addressField = driver.findElement(By.id("com.ecommerce.app:id/addressField"));
+        MobileElement pinCodeField = driver.findElement(By.id("com.ecommerce.app:id/pinCodeField"));
+
+        nameField.sendKeys(name);
+        addressField.sendKeys(address);
+        pinCodeField.sendKeys(pinCode);
+
+        MobileElement submitButton = driver.findElement(By.id("com.ecommerce.app:id/submitButton"));
+        submitButton.click();
+
+        // Validation for successful submission
+        MobileElement successMessage = driver.findElement(By.xpath("//android.widget.TextView[@text='Address saved successfully']"));
+        Assert.assertNotNull(successMessage, "Address should be saved successfully");
+    }
+
+    @Test(priority = 3)
+    public void testPaymentOption() {
+        MobileElement paymentOptions = driver.findElement(By.id("com.ecommerce.app:id/paymentOptions"));
+        paymentOptions.click();
+        MobileElement rupeesOption = driver.findElement(By.xpath("//android.widget.TextView[@text='Rupees']"));
+        rupeesOption.click();
+        MobileElement selectedOption = driver.findElement(By.xpath("//android.widget.TextView[@text='Rupees']"));
+        Assert.assertNotNull(selectedOption, "Rupees should be selected as the payment option");
+    }
+
+    @Test(priority = 4)
+    public void testPostDeliveryReview() {
+        // Assuming the delivery has been completed and now checking for the review option
+        MobileElement reviewButton = driver.findElement(By.id("com.ecommerce.app:id/reviewButton"));
+        reviewButton.click();
+        MobileElement reviewForm = driver.findElement(By.id("com.ecommerce.app:id/reviewForm"));
+        Assert.assertNotNull(reviewForm, "Review form should be displayed");
+
+        MobileElement ratingField = driver.findElement(By.id("com.ecommerce.app:id/ratingField"));
+        MobileElement commentsField = driver.findElement(By.id("com.ecommerce.app:id/commentsField"));
+
+        ratingField.sendKeys("5");
+        commentsField.sendKeys("Excellent product!");
+
+        MobileElement submitReview = driver.findElement(By.id("com.ecommerce.app:id/submitReviewButton"));
+        submitReview.click();
+
+        // Validation for successful review submission
+        MobileElement successMessage = driver.findElement(By.xpath("//android.widget.TextView[@text='Review submitted successfully']"));
+        Assert.assertNotNull(successMessage, "Review should be submitted successfully");
+    }
+
+    @AfterClass
+    public void teardown() {
         if (driver != null) {
             driver.quit();
         }
-    }
-
-    @DataProvider(name = "vaccinationDates")
-    public Object[][] vaccinationDates() {
-        return new Object[][]{
-                {"earliest"}, {"earliest+1"}, {"latest"}, {"latest-1"},
-                {"beforeEarliest"}, {"afterLatest"}, {"earliest+1Month"}, {"latest-1Month"}
-        };
-    }
-
-    @Test(dataProvider = "vaccinationDates")
-    public void testVaccinationScheduling(String dateScenario) {
-        driver.get(prop.getProperty("baseUrl"));
-
-        LoginPage loginPage = new LoginPage(driver);
-        loginPage.enterUsername(prop.getProperty("parentUsername"));
-        loginPage.enterPassword(prop.getProperty("parentPassword"));
-        loginPage.clickLogin();
-
-        VaccinationSchedulingPage schedulingPage = new VaccinationSchedulingPage(driver);
-        schedulingPage.navigateToChildProfile();
-        schedulingPage.clickScheduleVaccination();
-
-        switch (dateScenario) {
-            case "earliest":
-                schedulingPage.selectEarliestDate();
-                break;
-            case "earliest+1":
-                schedulingPage.selectDateAfterEarliest();
-                break;
-            case "latest":
-                schedulingPage.selectLatestDate();
-                break;
-            case "latest-1":
-                schedulingPage.selectDateBeforeLatest();
-                break;
-            case "beforeEarliest":
-                schedulingPage.selectDateBeforeEarliest();
-                schedulingPage.verifyDateNotAvailable();
-                break;
-            case "afterLatest":
-                schedulingPage.selectDateAfterLatest();
-                schedulingPage.verifyDateNotAvailable();
-                break;
-            case "earliest+1Month":
-                schedulingPage.selectDateOneMonthAfterEarliest();
-                schedulingPage.verifyDateNotAvailable();
-                break;
-            case "latest-1Month":
-                schedulingPage.selectDateOneMonthBeforeLatest();
-                schedulingPage.verifyDateNotAvailable();
-                break;
-        }
-        schedulingPage.confirmAppointment();
-    }
-
-    @DataProvider(name = "registrationData")
-    public Object[][] registrationData() {
-        return new Object[][]{
-                {"0", "John Doe", "2023-10-15", "Jane Doe", "jane@example.com"},
-                {"4", "Alice Smith", "2018-10-16", "Robert Smith", "robert@example.com"},
-                {"1", "A", "2021-05-20", "Sarah Connor", "sarah@example.com"},
-                {"50", "A very long name that exceeds fifty characters", "2022-07-14", "John Smith", "john@example.com"},
-                {"5", "Michael Johnson", "2020-03-12", "Linda Johnson", "lj@ex"},
-                {"50", "Emma Williams", "2019-11-25", "David Williams", "david@example.com"}
-        };
-    }
-
-    @Test(dataProvider = "registrationData")
-    public void testChildRegistration(String age, String childName, String dob, String parentName, String parentContact) {
-        driver.get(prop.getProperty("baseUrl") + "/register");
-
-        RegistrationPage registrationPage = new RegistrationPage(driver);
-        registrationPage.enterChildName(childName);
-        registrationPage.enterChildDOB(dob);
-        registrationPage.enterParentName(parentName);
-        registrationPage.enterParentContact(parentContact);
-        registrationPage.submitForm();
     }
 }
