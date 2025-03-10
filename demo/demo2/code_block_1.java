@@ -1,117 +1,81 @@
-package com.ecommerce.tests;
-
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.By;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
+public class PolicyRenewalReminderTest {
+    private WebDriver driver;
+    private SoftAssert softAssert;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-
-public class ECommerceTests {
-
-    private AppiumDriver<MobileElement> driver;
-    private DesiredCapabilities capabilities = new DesiredCapabilities();
-    private String platform = System.getProperty("platform", "android"); // default to android
-
-    @BeforeClass
-    public void setup() throws MalformedURLException {
-        if (platform.equalsIgnoreCase("android")) {
-            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
-            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android Emulator");
-            capabilities.setCapability(MobileCapabilityType.APP, "path/to/android/app.apk");
-            driver = new AndroidDriver<>(new URL("http://localhost:4723/wd/hub"), capabilities);
-        } else if (platform.equalsIgnoreCase("ios")) {
-            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
-            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone Simulator");
-            capabilities.setCapability(MobileCapabilityType.APP, "path/to/ios/app.ipa");
-            driver = new IOSDriver<>(new URL("http://localhost:4723/wd/hub"), capabilities);
-        }
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    @BeforeMethod
+    public void setUp() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+        driver = new ChromeDriver(options);
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        softAssert = new SoftAssert();
     }
 
-    @DataProvider(name = "userData")
-    public Object[][] getUserData() throws IOException, CsvException {
-        CSVReader reader = new CSVReader(new FileReader("path/to/data.csv"));
-        return reader.readAll().toArray(new Object[0][]);
+    @DataProvider(name = "loginData")
+    public Object[][] loginData() {
+        return new Object[][] {
+            {"Admin123", "password123"}
+        };
     }
 
-    @Test(priority = 1)
-    public void testSelectiPhone15() {
-        MobileElement product = driver.findElement(By.xpath("//android.widget.TextView[@text='iPhone 15']"));
-        product.click();
-        MobileElement addToCart = driver.findElement(By.id("com.ecommerce.app:id/addToCartButton"));
-        addToCart.click();
-        MobileElement cartItem = driver.findElement(By.xpath("//android.widget.TextView[@text='iPhone 15']"));
-        Assert.assertNotNull(cartItem, "iPhone 15 should be added to the cart");
+    @Test(dataProvider = "loginData")
+    public void verifyPolicyRenewalReminder(String loginID, String password) {
+        driver.get("http://myvehicleinsurance.com/policylist");
+        softAssert.assertTrue(driver.getTitle().contains("Policy List"), "URL did not open correctly in Chrome");
+
+        WebElement loginField = driver.findElement(By.id("loginID"));
+        WebElement passwordField = driver.findElement(By.id("password"));
+        WebElement loginButton = driver.findElement(By.id("loginButton"));
+
+        loginField.sendKeys(loginID);
+        passwordField.sendKeys(password);
+        loginButton.click();
+
+        softAssert.assertTrue(driver.getTitle().contains("Policy Dashboard"), "Login failed");
+
+        WebElement policyTypeDropdown = driver.findElement(By.id("policyType"));
+        policyTypeDropdown.click();
+        WebElement vehicleInsuranceOption = driver.findElement(By.xpath("//option[text()='Vehicle Insurance']"));
+        vehicleInsuranceOption.click();
+        
+        WebElement dateFilter = driver.findElement(By.id("dateFilter"));
+        dateFilter.click();
+        WebElement dateOption = driver.findElement(By.xpath("//option[text()='In next 90 days']"));
+        dateOption.click();
+
+        WebElement enterButton = driver.findElement(By.id("enterButton"));
+        enterButton.click();
+
+        WebElement reminderActiveColumn = driver.findElement(By.xpath("//td[@class='reminderActive']"));
+        softAssert.assertEquals(reminderActiveColumn.getText(), "Yes", "Reminder Active column value mismatch");
+
+        WebElement reminderTypeColumn = driver.findElement(By.xpath("//td[@class='reminderType']"));
+        softAssert.assertEquals(reminderTypeColumn.getText(), "Renewal", "Reminder Type column value mismatch");
+
+        WebElement reminderAlertModeColumn = driver.findElement(By.xpath("//td[@class='reminderAlertMode']"));
+        softAssert.assertTrue(reminderAlertModeColumn.getText().matches("Call|Text|Email"), "Reminder Alert Mode column value mismatch");
+
+        WebElement logoutButton = driver.findElement(By.id("logoutButton"));
+        logoutButton.click();
+        softAssert.assertTrue(driver.getTitle().contains("Login"), "Logout failed");
+
+        softAssert.assertAll();
     }
 
-    @Test(priority = 2, dataProvider = "userData")
-    public void testProvideDeliveryDetails(String name, String address, String pinCode) {
-        MobileElement nameField = driver.findElement(By.id("com.ecommerce.app:id/nameField"));
-        MobileElement addressField = driver.findElement(By.id("com.ecommerce.app:id/addressField"));
-        MobileElement pinCodeField = driver.findElement(By.id("com.ecommerce.app:id/pinCodeField"));
-
-        nameField.sendKeys(name);
-        addressField.sendKeys(address);
-        pinCodeField.sendKeys(pinCode);
-
-        MobileElement submitButton = driver.findElement(By.id("com.ecommerce.app:id/submitButton"));
-        submitButton.click();
-
-        // Validation for successful submission
-        MobileElement successMessage = driver.findElement(By.xpath("//android.widget.TextView[@text='Address saved successfully']"));
-        Assert.assertNotNull(successMessage, "Address should be saved successfully");
-    }
-
-    @Test(priority = 3)
-    public void testPaymentOption() {
-        MobileElement paymentOptions = driver.findElement(By.id("com.ecommerce.app:id/paymentOptions"));
-        paymentOptions.click();
-        MobileElement rupeesOption = driver.findElement(By.xpath("//android.widget.TextView[@text='Rupees']"));
-        rupeesOption.click();
-        MobileElement selectedOption = driver.findElement(By.xpath("//android.widget.TextView[@text='Rupees']"));
-        Assert.assertNotNull(selectedOption, "Rupees should be selected as the payment option");
-    }
-
-    @Test(priority = 4)
-    public void testPostDeliveryReview() {
-        // Assuming the delivery has been completed and now checking for the review option
-        MobileElement reviewButton = driver.findElement(By.id("com.ecommerce.app:id/reviewButton"));
-        reviewButton.click();
-        MobileElement reviewForm = driver.findElement(By.id("com.ecommerce.app:id/reviewForm"));
-        Assert.assertNotNull(reviewForm, "Review form should be displayed");
-
-        MobileElement ratingField = driver.findElement(By.id("com.ecommerce.app:id/ratingField"));
-        MobileElement commentsField = driver.findElement(By.id("com.ecommerce.app:id/commentsField"));
-
-        ratingField.sendKeys("5");
-        commentsField.sendKeys("Excellent product!");
-
-        MobileElement submitReview = driver.findElement(By.id("com.ecommerce.app:id/submitReviewButton"));
-        submitReview.click();
-
-        // Validation for successful review submission
-        MobileElement successMessage = driver.findElement(By.xpath("//android.widget.TextView[@text='Review submitted successfully']"));
-        Assert.assertNotNull(successMessage, "Review should be submitted successfully");
-    }
-
-    @AfterClass
-    public void teardown() {
+    @AfterMethod
+    public void tearDown() {
         if (driver != null) {
             driver.quit();
         }
