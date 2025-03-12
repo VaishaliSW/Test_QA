@@ -1,122 +1,115 @@
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
+package com.example.tests;
+
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
-import org.testng.annotations.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Properties;
 
-public class SauceDemoTest {
-    private AppiumDriver<MobileElement> driver;
+public class VaccinationAppointmentTest {
+    private WebDriver driver;
+    private Properties prop;
 
-    @BeforeClass
-    @Parameters({"platformName", "deviceName", "appUrl", "appPath"})
-    public void setUp(String platformName, String deviceName, String appUrl, String appPath) throws MalformedURLException {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability("platformName", platformName);
-        capabilities.setCapability("deviceName", deviceName);
-        capabilities.setCapability("app", appPath);
-        driver = platformName.equalsIgnoreCase("Android") ?
-                new AndroidDriver<>(new URL(appUrl), capabilities) :
-                new IOSDriver<>(new URL(appUrl), capabilities);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-    }
+    @BeforeMethod
+    public void setUp() throws IOException {
+        prop = new Properties();
+        FileInputStream fis = new FileInputStream("src/main/resources/config.properties");
+        prop.load(fis);
 
-    @Test(priority = 1)
-    public void validateLoginFunctionality() {
-        // Launch the saucedemo app
-        MobileElement homeScreen = driver.findElement(By.xpath("//android.widget.TextView[@content-desc='SauceDemo home screen']"));
-        Assert.assertTrue(homeScreen.isDisplayed(), "User should be able to see the saucedemo home screen");
-
-        // Verify the username and password fields are available
-        MobileElement usernameField = driver.findElement(By.xpath("//android.widget.EditText[@content-desc='test-Username']"));
-        MobileElement passwordField = driver.findElement(By.xpath("//android.widget.EditText[@content-desc='test-Password']"));
-        Assert.assertTrue(usernameField.isEnabled(), "Username field should be active");
-        Assert.assertTrue(passwordField.isEnabled(), "Password field should be active");
-
-        // Enter the username and password
-        usernameField.sendKeys("standard_user");
-        Assert.assertEquals(usernameField.getText(), "standard_user", "User should be able to enter the username");
-
-        passwordField.sendKeys("secret_sauce");
-        Assert.assertEquals(passwordField.getText(), "secret_sauce", "User should be able to enter the password");
-
-        // Tap on Login and verify the user has successfully logged in
-        MobileElement loginButton = driver.findElement(By.xpath("//android.widget.Button[@content-desc='test-LOGIN']"));
-        loginButton.click();
-        MobileElement loggedInScreen = driver.findElement(By.xpath("//android.widget.TextView[@content-desc='Logged in as standard user']"));
-        Assert.assertTrue(loggedInScreen.isDisplayed(), "User should be successfully logged in as standard user");
-    }
-
-    @Test(priority = 2)
-    public void validateShoppingFunctionality() {
-        // Access the saucedemo site and login using the standard user
-        validateLoginFunctionality();
-
-        // Select any 1 item to the cart
-        MobileElement item = driver.findElement(By.xpath("//android.widget.TextView[@content-desc='Item 1']"));
-        item.click();
-        MobileElement cartIcon = driver.findElement(By.xpath("//android.widget.ImageView[@content-desc='Cart Icon']"));
-        Assert.assertEquals(cartIcon.getAttribute("quantity"), "1", "The item should be added in the cart and the cart icon shows the qty");
-
-        // Tap on the top right corner on the cart icon to proceed to the cart
-        cartIcon.click();
-        MobileElement cartPage = driver.findElement(By.xpath("//android.widget.TextView[@content-desc='Cart Page']"));
-        Assert.assertTrue(cartPage.isDisplayed(), "User should be navigated to the cart page");
-
-        // Verify if the chosen items are shown in the cart
-        MobileElement cartItem = driver.findElement(By.xpath("//android.widget.TextView[@content-desc='Item 1 in cart']"));
-        Assert.assertTrue(cartItem.isDisplayed(), "The items added should be shown in the cart page");
-
-        // Tap on "Checkout"
-        MobileElement checkoutButton = driver.findElement(By.xpath("//android.widget.Button[@content-desc='Checkout']"));
-        checkoutButton.click();
-        MobileElement checkoutPage = driver.findElement(By.xpath("//android.widget.TextView[@content-desc='Checkout Page']"));
-        Assert.assertTrue(checkoutPage.isDisplayed(), "User should be navigated to the checkout page");
-
-        // Enter the first name, last name and zip code
-        MobileElement firstNameField = driver.findElement(By.xpath("//android.widget.EditText[@content-desc='test-First Name']"));
-        MobileElement lastNameField = driver.findElement(By.xpath("//android.widget.EditText[@content-desc='test-Last Name']"));
-        MobileElement zipCodeField = driver.findElement(By.xpath("//android.widget.EditText[@content-desc='test-Zip Code']"));
-
-        firstNameField.sendKeys("John");
-        lastNameField.sendKeys("Doe");
-        zipCodeField.sendKeys("12345");
-
-        Assert.assertEquals(firstNameField.getText(), "John", "User should be able to enter values in the given fields");
-        Assert.assertEquals(lastNameField.getText(), "Doe", "User should be able to enter values in the given fields");
-        Assert.assertEquals(zipCodeField.getText(), "12345", "User should be able to enter values in the given fields");
-
-        // Tap on "Continue" and then verify the total cost if it is the expected and print the status
-        MobileElement continueButton = driver.findElement(By.xpath("//android.widget.Button[@content-desc='Continue']"));
-        continueButton.click();
-        MobileElement totalCost = driver.findElement(By.xpath("//android.widget.TextView[@content-desc='Total Cost']"));
-        Assert.assertEquals(totalCost.getText(), "$29.99", "User should be navigated to the next page");
-        System.out.println("Total cost is as expected: " + totalCost.getText());
-
-        // Tap on "Finish" and verify if the thank you message is shown and print the status
-        MobileElement finishButton = driver.findElement(By.xpath("//android.widget.Button[@content-desc='Finish']"));
-        finishButton.click();
-        MobileElement thankYouMessage = driver.findElement(By.xpath("//android.widget.TextView[@content-desc='Thank you for your order!']"));
-        Assert.assertTrue(thankYouMessage.isDisplayed(), "Order should be placed");
-        System.out.println("Thank you message is displayed: " + thankYouMessage.getText());
-
-        // Capture screenshot upon test failure
-        if (!thankYouMessage.isDisplayed()) {
-            File screenshot = driver.getScreenshotAs(OutputType.FILE);
-            FileUtils.copyFile(screenshot, new File("screenshots/thank_you_message.png"));
+        String browser = prop.getProperty("browser");
+        if (browser.equalsIgnoreCase("chrome")) {
+            ChromeOptions options = new ChromeOptions();
+            if (Boolean.parseBoolean(prop.getProperty("chromeHeadless"))) {
+                options.addArguments("--headless=new");
+            }
+            driver = new ChromeDriver(options);
         }
+        // Implement for other browsers similarly
+
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
     }
 
-    @AfterClass
+    @AfterMethod
     public void tearDown() {
         if (driver != null) {
             driver.quit();
         }
+    }
+
+    @DataProvider(name = "appointmentData")
+    public Object[][] appointmentData() {
+        return new Object[][]{
+            {"https://vaccinationportal.com/schedule", "JohnDoe", "Pass@123", "Alex Doe", "2023-11-15", "Appointment confirmed for vaccination"},
+            {"https://vaccinationportal.com/schedule", "JohnDoe", "Pass@123", "Alex Doe", "2023-12-10", "Appointment confirmed"},
+            {"https://vaccinationportal.com/schedule", "JohnDoe", "Pass@123", "Alex Doe", "2023-11-20", "2023-11-22", "Appointment confirmed"},
+            {"https://vaccinationportal.com/schedule", "SarahSmith", "SafePass@456", "Emma Smith", "2023-12-25", "2023-12-26", "Appointment confirmed"}
+        };
+    }
+
+    @Test(dataProvider = "appointmentData")
+    public void testScheduleAppointment(String url, String username, String password, String childName, String date, String expectedMessage) {
+        driver.get(url);
+
+        WebElement usernameField = driver.findElement(By.id("username"));
+        WebElement passwordField = driver.findElement(By.id("password"));
+        WebElement loginButton = driver.findElement(By.id("loginButton"));
+
+        usernameField.sendKeys(username);
+        passwordField.sendKeys(password);
+        loginButton.click();
+
+        WebElement childList = driver.findElement(By.id("childList"));
+        WebElement child = childList.findElement(By.xpath("//span[text()='" + childName + "']"));
+        child.click();
+
+        WebElement calendar = driver.findElement(By.id("calendar"));
+        WebElement dateElement = calendar.findElement(By.xpath("//td[text()='" + date + "']"));
+        dateElement.click();
+
+        WebElement confirmButton = driver.findElement(By.id("confirmButton"));
+        confirmButton.click();
+
+        WebElement confirmationMessage = driver.findElement(By.id("confirmationMessage"));
+        Assert.assertEquals(confirmationMessage.getText(), expectedMessage);
+    }
+
+    @Test(dataProvider = "appointmentData")
+    public void testAlternativeAppointment(String url, String username, String password, String childName, String unavailableDate, String alternativeDate, String expectedMessage) {
+        driver.get(url);
+
+        WebElement usernameField = driver.findElement(By.id("username"));
+        WebElement passwordField = driver.findElement(By.id("password"));
+        WebElement loginButton = driver.findElement(By.id("loginButton"));
+
+        usernameField.sendKeys(username);
+        passwordField.sendKeys(password);
+        loginButton.click();
+
+        WebElement childList = driver.findElement(By.id("childList"));
+        WebElement child = childList.findElement(By.xpath("//span[text()='" + childName + "']"));
+        child.click();
+
+        WebElement calendar = driver.findElement(By.id("calendar"));
+        WebElement unavailableDateElement = calendar.findElement(By.xpath("//td[text()='" + unavailableDate + "']"));
+        unavailableDateElement.click();
+
+        WebElement alternativeDateElement = driver.findElement(By.xpath("//td[text()='" + alternativeDate + "']"));
+        alternativeDateElement.click();
+
+        WebElement confirmButton = driver.findElement(By.id("confirmButton"));
+        confirmButton.click();
+
+        WebElement confirmationMessage = driver.findElement(By.id("confirmationMessage"));
+        Assert.assertEquals(confirmationMessage.getText(), expectedMessage);
     }
 }
