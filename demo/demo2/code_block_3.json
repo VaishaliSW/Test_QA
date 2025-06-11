@@ -1,0 +1,10 @@
+// File: testdata.json
+{
+    "trainerEmail": "trainer@example.com",
+    "searchTerms": {
+        "TC001": "Regression Testing",
+        "TC002": ["Test Automation", "Load Testing", "Quality Assurance"],
+        "TC003": "Multiple terms",
+        "TC004": "Usability Testing"
+    }
+}
