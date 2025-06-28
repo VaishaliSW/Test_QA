@@ -1,5 +1,9 @@
-// File: config.json
 {
-  "baseUrl": "http://atm-system.example.com",
-  "browser": "chrome"
+  "baseUrl": "http://example-atm-system.com",
+  "browser": "chrome",
+  "driverPath": {
+    "chrome": "/path/to/chromedriver",
+    "firefox": "/path/to/geckodriver",
+    "edge": "/path/to/msedgedriver"
+  }
 }
