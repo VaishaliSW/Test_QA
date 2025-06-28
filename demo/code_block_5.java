@@ -2,25 +2,23 @@
 package utils;
 
 import org.json.JSONObject;
-import org.json.JSONTokener;
-import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
 
 public class ConfigReader {
-    private JSONObject configData;
+    private static JSONObject configData;
 
-    public ConfigReader() {
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream("config/config.json")) {
-            if (is == null) {
-                throw new RuntimeException("Config file not found");
-            }
-            JSONTokener tokener = new JSONTokener(is);
-            configData = new JSONObject(tokener);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load config", e);
+    static {
+        try {
+            String content = new String(Files.readAllBytes(Paths.get("config/config.json")));
+            configData = new JSONObject(content);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public String getConfigData(String key) {
+    public static String getConfigData(String key) {
         return configData.getString(key);
     }
 }
