@@ -1,5 +1,5 @@
 // File: config.json
 {
-  "baseUrl": "http://example-cinema.com",
+  "baseUrl": "http://atm-system.example.com",
   "browser": "chrome"
 }
