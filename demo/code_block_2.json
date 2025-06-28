@@ -1,0 +1,5 @@
+// File: config.json
+{
+  "baseUrl": "http://example-cinema.com",
+  "browser": "chrome"
+}
