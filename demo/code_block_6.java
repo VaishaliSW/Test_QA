@@ -2,25 +2,23 @@
 package utils;
 
 import org.json.JSONObject;
-import org.json.JSONTokener;
-import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
 
 public class TestDataReader {
-    private JSONObject testData;
+    private static JSONObject testData;
 
-    public TestDataReader() {
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream("config/testdata.json")) {
-            if (is == null) {
-                throw new RuntimeException("Test data file not found");
-            }
-            JSONTokener tokener = new JSONTokener(is);
-            testData = new JSONObject(tokener);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load test data", e);
+    static {
+        try {
+            String content = new String(Files.readAllBytes(Paths.get("config/testdata.json")));
+            testData = new JSONObject(content);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public Object getTestData(String key) {
-        return testData.get(key);
+    public static String getTestData(String key) {
+        return testData.getJSONObject(key).toString();
     }
 }
