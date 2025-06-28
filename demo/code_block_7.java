@@ -1,4 +1,3 @@
-// File: LoginPage.java
 package pages;
 
 import org.openqa.selenium.By;
@@ -14,6 +13,7 @@ public class LoginPage {
     private By usernameField = By.id("username");
     private By passwordField = By.id("password");
     private By loginButton = By.id("loginButton");
+    private By loginSuccessMessage = By.id("loginSuccessMessage");
 
     public LoginPage(WebDriver driver) {
         this.driver = driver;
@@ -37,7 +37,9 @@ public class LoginPage {
         driver.findElement(loginButton).click();
     }
 
-    public void waitForDashboardPage() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dashboard")));
+    public boolean isLoginSuccessful() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(loginSuccessMessage));
+        WebElement successMessage = driver.findElement(loginSuccessMessage);
+        return successMessage.isDisplayed();
     }
 }
