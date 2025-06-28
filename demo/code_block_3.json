@@ -1,0 +1,5 @@
+// File: testdata.json
+{
+  "age": 15,
+  "expectedDiscount": 0.5
+}
