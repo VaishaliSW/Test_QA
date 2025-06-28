@@ -1,46 +1,24 @@
-// File: AgeBasedDiscountTest.java
-package tests;
+// File: DashboardPage.java
+package pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-import pages.HomePage;
-import utils.DriverManager;
-import utils.ConfigReader;
-import utils.TestDataReader;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class AgeBasedDiscountTest {
+public class DashboardPage {
     private WebDriver driver;
-    private ConfigReader configReader;
-    private TestDataReader testDataReader;
+    private WebDriverWait wait;
 
-    @BeforeMethod
-    public void setUp() {
-        configReader = new ConfigReader();
-        testDataReader = new TestDataReader();
-        driver = DriverManager.getDriver(configReader.getConfigData("browser"));
-        driver.get(configReader.getConfigData("baseUrl"));
+    private By withdrawalLink = By.id("withdrawalLink");
+
+    public DashboardPage(WebDriver driver) {
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, 10);
     }
 
-    @Test
-    public void testAgeBasedDiscount() {
-        HomePage homePage = new HomePage(driver);
-        int age = (int) testDataReader.getTestData("age");
-        double expectedDiscount = (double) testDataReader.getTestData("expectedDiscount");
-
-        homePage.enterAge(age);
-        homePage.calculateDiscount();
-        double actualDiscount = homePage.getDiscountResult();
-
-        Assert.assertEquals(actualDiscount, expectedDiscount, "Discount does not match expected value");
-    }
-
-    @AfterMethod
-    public void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
+    public void navigateToWithdrawalPage() {
+        driver.findElement(withdrawalLink).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("withdrawalForm")));
     }
 }
