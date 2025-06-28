@@ -1,4 +1,4 @@
-// File: HomePage.java
+// File: LoginPage.java
 package pages;
 
 import org.openqa.selenium.By;
@@ -7,27 +7,37 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class HomePage {
+public class LoginPage {
     private WebDriver driver;
-    private By ageInput = By.id("ageInput");
-    private By calculateButton = By.id("calculateButton");
-    private By discountResult = By.id("discountResult");
+    private WebDriverWait wait;
 
-    public HomePage(WebDriver driver) {
+    private By usernameField = By.id("username");
+    private By passwordField = By.id("password");
+    private By loginButton = By.id("loginButton");
+
+    public LoginPage(WebDriver driver) {
         this.driver = driver;
+        this.wait = new WebDriverWait(driver, 10);
     }
 
-    public void enterAge(int age) {
-        driver.findElement(ageInput).sendKeys(String.valueOf(age));
+    public void navigateToLoginPage(String baseUrl) {
+        driver.get(baseUrl + "/login");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(usernameField));
     }
 
-    public void calculateDiscount() {
-        driver.findElement(calculateButton).click();
+    public void enterUsername(String username) {
+        driver.findElement(usernameField).sendKeys(username);
     }
 
-    public double getDiscountResult() {
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        WebElement discountElement = wait.until(ExpectedConditions.visibilityOfElementLocated(discountResult));
-        return Double.parseDouble(discountElement.getText());
+    public void enterPassword(String password) {
+        driver.findElement(passwordField).sendKeys(password);
+    }
+
+    public void clickLoginButton() {
+        driver.findElement(loginButton).click();
+    }
+
+    public void waitForDashboardPage() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("dashboard")));
     }
 }
