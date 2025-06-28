@@ -5,18 +5,29 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.edge.EdgeDriver;
+import java.util.concurrent.TimeUnit;
 
 public class DriverManager {
+    private static WebDriver driver;
+
     public static WebDriver getDriver(String browser) {
         switch (browser.toLowerCase()) {
             case "chrome":
-                return new ChromeDriver();
+                System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+                driver = new ChromeDriver();
+                break;
             case "firefox":
-                return new FirefoxDriver();
+                System.setProperty("webdriver.gecko.driver", "path/to/geckodriver");
+                driver = new FirefoxDriver();
+                break;
             case "edge":
-                return new EdgeDriver();
+                System.setProperty("webdriver.edge.driver", "path/to/edgedriver");
+                driver = new EdgeDriver();
+                break;
             default:
-                throw new IllegalArgumentException("Unsupported browser: " + browser);
+                throw new IllegalArgumentException("Browser not supported");
         }
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        return driver;
     }
 }
