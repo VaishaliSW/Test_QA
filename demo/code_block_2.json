@@ -1,9 +1,15 @@
+// testData.json
 {
-  "baseUrl": "http://example-atm-system.com",
-  "browser": "chrome",
-  "driverPath": {
-    "chrome": "/path/to/chromedriver",
-    "firefox": "/path/to/geckodriver",
-    "edge": "/path/to/msedgedriver"
-  }
+    "urls": {
+        "languageDiversitySection": "https://example.com/language-diversity",
+        "languageStatisticsPage": "https://example.com/language-statistics",
+        "exportFunction": "https://example.com/export",
+        "filteringOptions": "https://example.com/filter-options"
+    },
+    "users": {
+        "defaultUser": {
+            "username": "user123",
+            "password": "password123"
+        }
+    }
 }
