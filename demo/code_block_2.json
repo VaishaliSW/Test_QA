@@ -1,13 +1,5 @@
-// File: testdata.json
+// File: config.json
 {
-  "email": "testuser@example.com",
-  "feedbackMessage": [
-    "Great service!",
-    "Loved the product!",
-    "Fantastic support team!",
-    "Excellent product range!",
-    "Quick delivery!"
-  ],
-  "additionalComment": "Keep up the good work!",
-  "attachmentPath": "path/to/receipt.jpg"
+    "browser": "chrome",
+    "baseUrl": "http://localhost:8080"
 }
