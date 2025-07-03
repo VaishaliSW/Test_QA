@@ -1,5 +1,16 @@
-// File: config.json
+// File: testdata.json
 {
-    "browser": "chrome",
-    "baseUrl": "http://localhost:8080"
+    "registration": {
+        "username": "user001",
+        "email": "user001@example.com",
+        "password": "Secure@123"
+    },
+    "login": {
+        "username": "user001",
+        "password": "Secure@123"
+    },
+    "passwordReset": {
+        "email": "user001@example.com",
+        "newPassword": "Secure@456"
+    }
 }
