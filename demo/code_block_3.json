@@ -1,25 +1,19 @@
+// File: testdata.json
 {
-  "TC001": {
-    "paymentAmount": "50.00"
-  },
-  "TC002": {
-    "paymentAmount": "75.50",
-    "note": "Gift purchase",
-    "shippingOption": "Expedited",
-    "discountCode": "SAVE10"
-  },
-  "TC003": {
-    "paymentAmount": "1000.00",
-    "securityStep": "2FA Prompt",
-    "verificationCode": "123456"
-  },
-  "TC004": {
-    "paymentAmount": "25.00",
-    "newAccountEmail": "test@example.com"
-  },
-  "TC005": {
-    "subscriptionPlan": "Monthly Plan",
-    "recurringAmount": "19.99",
-    "nextBillingDate": "2022-12-01"
-  }
+    "testCases": [
+        {
+            "id": "TC001",
+            "description": "Verify that a user can successfully make a payment using Google Pay with minimum required inputs for a small purchase amount",
+            "steps": [
+                {"stepDescription": "Navigate to the payment page", "testData": "/payment", "expectedResult": "Payment page is displayed"},
+                {"stepDescription": "Select Google Pay as the payment method", "testData": "Google Pay", "expectedResult": "Google Pay option is selected"},
+                {"stepDescription": "Enter purchase amount", "testData": "10.99", "expectedResult": "Amount is entered correctly"},
+                {"stepDescription": "Click on Pay button", "testData": "Pay", "expectedResult": "Google Pay interface is launched"},
+                {"stepDescription": "Select default Google Pay account", "testData": "[EMAIL]", "expectedResult": "Google Pay account is selected"},
+                {"stepDescription": "Confirm payment", "testData": "Confirm", "expectedResult": "Payment confirmation screen is shown"},
+                {"stepDescription": "Verify payment success message", "testData": "Payment Successful", "expectedResult": "Success message is displayed"},
+                {"stepDescription": "Check receipt generation", "testData": "Receipt", "expectedResult": "Digital receipt is generated"}
+            ]
+        }
+    ]
 }
