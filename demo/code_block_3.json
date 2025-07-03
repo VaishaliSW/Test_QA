@@ -1,10 +1,25 @@
-// File: testdata.json
 {
-  "login": {
-    "username": "validUser",
-    "password": "validPassword"
+  "TC001": {
+    "paymentAmount": "50.00"
   },
-  "withdrawal": {
-    "amount": 100
+  "TC002": {
+    "paymentAmount": "75.50",
+    "note": "Gift purchase",
+    "shippingOption": "Expedited",
+    "discountCode": "SAVE10"
+  },
+  "TC003": {
+    "paymentAmount": "1000.00",
+    "securityStep": "2FA Prompt",
+    "verificationCode": "123456"
+  },
+  "TC004": {
+    "paymentAmount": "25.00",
+    "newAccountEmail": "test@example.com"
+  },
+  "TC005": {
+    "subscriptionPlan": "Monthly Plan",
+    "recurringAmount": "19.99",
+    "nextBillingDate": "2022-12-01"
   }
 }
