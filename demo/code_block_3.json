@@ -1,19 +1,16 @@
 // File: testdata.json
 {
-    "testCases": [
-        {
-            "id": "TC001",
-            "description": "Verify that a user can successfully make a payment using Google Pay with minimum required inputs for a small purchase amount",
-            "steps": [
-                {"stepDescription": "Navigate to the payment page", "testData": "/payment", "expectedResult": "Payment page is displayed"},
-                {"stepDescription": "Select Google Pay as the payment method", "testData": "Google Pay", "expectedResult": "Google Pay option is selected"},
-                {"stepDescription": "Enter purchase amount", "testData": "10.99", "expectedResult": "Amount is entered correctly"},
-                {"stepDescription": "Click on Pay button", "testData": "Pay", "expectedResult": "Google Pay interface is launched"},
-                {"stepDescription": "Select default Google Pay account", "testData": "[EMAIL]", "expectedResult": "Google Pay account is selected"},
-                {"stepDescription": "Confirm payment", "testData": "Confirm", "expectedResult": "Payment confirmation screen is shown"},
-                {"stepDescription": "Verify payment success message", "testData": "Payment Successful", "expectedResult": "Success message is displayed"},
-                {"stepDescription": "Check receipt generation", "testData": "Receipt", "expectedResult": "Digital receipt is generated"}
-            ]
-        }
-    ]
+  "login": {
+    "admin": { "username": "admin", "password": "Secure@5" },
+    "user1": { "username": "user1", "password": "Secure@5" },
+    "manager": { "username": "manager", "password": "Secure@5" },
+    "user2": { "username": "user2", "password": "Secure@5" }
+  },
+  "locations": {
+    "ClinicA": { "name": "Clinic A", "address": "123 Main St", "phone": "+1234567890" },
+    "ClinicB": { "name": "Clinic B", "address": "456 Elm St", "phone": "+2345678901" },
+    "ClinicC": { "name": "Clinic C", "address": "789 Oak St", "phone": "+3456789012" },
+    "ClinicD": { "name": "Clinic D", "address": "101 Maple St", "phone": "+4567890123" },
+    "ClinicE": { "name": "Clinic E", "address": "202 Birch St", "phone": "+5678901234" }
+  }
 }
