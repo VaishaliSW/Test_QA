@@ -1,16 +1,9 @@
 // File: testdata.json
 {
-  "login": {
-    "admin": { "username": "admin", "password": "Secure@5" },
-    "user1": { "username": "user1", "password": "Secure@5" },
-    "manager": { "username": "manager", "password": "Secure@5" },
-    "user2": { "username": "user2", "password": "Secure@5" }
-  },
-  "locations": {
-    "ClinicA": { "name": "Clinic A", "address": "123 Main St", "phone": "+1234567890" },
-    "ClinicB": { "name": "Clinic B", "address": "456 Elm St", "phone": "+2345678901" },
-    "ClinicC": { "name": "Clinic C", "address": "789 Oak St", "phone": "+3456789012" },
-    "ClinicD": { "name": "Clinic D", "address": "101 Maple St", "phone": "+4567890123" },
-    "ClinicE": { "name": "Clinic E", "address": "202 Birch St", "phone": "+5678901234" }
-  }
+    "parentName": "John Doe",
+    "childName": "Jane Doe",
+    "childAge": 3,
+    "vaccinationCenter": "Center A",
+    "appointmentDate": "2023-11-15",
+    "alternativeDates": ["2023-12-01", "2023-12-02"]
 }
