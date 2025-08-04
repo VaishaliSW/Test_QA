@@ -1,5 +1,5 @@
 // File: config.json
 {
-  "browser": "chrome",
-  "baseUrl": "https://example.com"
+    "browser": "chrome",
+    "baseUrl": "http://example.com"
 }
