@@ -1,23 +1,23 @@
-// File: ConfigReader.java
+// File: DriverManager.java
 package utils;
 
-import org.json.JSONObject;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
-public class ConfigReader {
-    private JSONObject configData;
+public class DriverManager {
 
-    public ConfigReader(String filePath) {
-        try {
-            String content = new String(Files.readAllBytes(Paths.get(filePath)));
-            configData = new JSONObject(content);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static WebDriver getDriver(String browser) {
+        switch (browser.toLowerCase()) {
+            case "chrome":
+                return new ChromeDriver();
+            case "firefox":
+                return new FirefoxDriver();
+            case "edge":
+                return new EdgeDriver();
+            default:
+                throw new IllegalArgumentException("Invalid browser: " + browser);
         }
-    }
-
-    public String getConfigData(String key) {
-        return configData.getString(key);
     }
 }
