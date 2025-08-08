@@ -1,9 +1,11 @@
 // File: testdata.json
 {
-    "parentName": "John Doe",
-    "childName": "Jane Doe",
-    "childAge": 3,
-    "vaccinationCenter": "Center A",
-    "appointmentDate": "2023-11-15",
-    "alternativeDates": ["2023-12-01", "2023-12-02"]
+  "defects": [
+    { "id": 101, "description": "Initial defect description" },
+    { "id": 102, "description": "Another defect description" },
+    { "id": 103, "description": "Critical defect description" }
+  ],
+  "searchTerms": {
+    "advancedSearch": "Critical"
+  }
 }
