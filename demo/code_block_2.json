@@ -1,10 +1,7 @@
-// File: config.json
 {
-  "baseUrl": "http://example.com",
-  "adminEmail": "admin@example.com",
-  "standardUserEmail": "standard@example.com",
-  "guestEmail": "guest@example.com",
-  "newUserEmail": "newuser@example.com",
-  "experiencedUserEmail": "experienced@example.com",
-  "password": "Secure@5"
+  "username": "standard_user",
+  "password": "secret_sauce",
+  "firstName": "John",
+  "lastName": "Doe",
+  "zipCode": "12345"
 }
