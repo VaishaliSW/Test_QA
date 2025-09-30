@@ -1,7 +1,13 @@
 {
-  "username": "standard_user",
-  "password": "secret_sauce",
-  "firstName": "John",
-  "lastName": "Doe",
-  "zipCode": "12345"
+  "ORDER_TYPE": "OR",
+  "SALES_ORGANIZATION": "1000",
+  "DISTRIBUTION_CHANNEL": "10",
+  "DIVISION": "00",
+  "PO_NUMBER": "Test_PO_{{random}}",
+  "PO_DATE": "{{currentDate}}",
+  "SOLD_TO_PARTY": "1000000",
+  "SHIP_TO_PARTY": "1000000",
+  "MATERIAL": "TG11",
+  "ORDER_QUANTITY": "10",
+  "EXPECTED_SUCCESS_MESSAGE": "Standard Order.*has been saved"
 }
