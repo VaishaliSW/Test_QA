@@ -5,18 +5,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class ConfigReader {
-    private static JSONObject configData;
-
-    static {
+    public static String getConfigData(String key) {
         try {
             String content = new String(Files.readAllBytes(Paths.get("config/config.json")));
-            configData = new JSONObject(content);
+            JSONObject jsonObject = new JSONObject(content);
+            return jsonObject.getString(key);
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-    }
-
-    public static String getConfigData(String key) {
-        return configData.getString(key);
     }
 }
