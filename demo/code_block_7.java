@@ -6,40 +6,37 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class LoginPage {
+public class ATMLoginPage {
     private WebDriver driver;
     private WebDriverWait wait;
 
     private By usernameField = By.id("username");
     private By passwordField = By.id("password");
     private By loginButton = By.id("loginButton");
-    private By loginSuccessMessage = By.id("loginSuccessMessage");
 
-    public LoginPage(WebDriver driver) {
+    public ATMLoginPage(WebDriver driver, int timeout) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, 10);
+        this.wait = new WebDriverWait(driver, timeout);
     }
 
-    public void navigateToLoginPage(String baseUrl) {
-        driver.get(baseUrl + "/login");
+    public void openLoginPage(String baseUrl) {
+        driver.get(baseUrl + "/atm/login");
         wait.until(ExpectedConditions.visibilityOfElementLocated(usernameField));
     }
 
     public void enterUsername(String username) {
-        driver.findElement(usernameField).sendKeys(username);
+        WebElement usernameElement = driver.findElement(usernameField);
+        usernameElement.clear();
+        usernameElement.sendKeys(username);
     }
 
     public void enterPassword(String password) {
-        driver.findElement(passwordField).sendKeys(password);
+        WebElement passwordElement = driver.findElement(passwordField);
+        passwordElement.clear();
+        passwordElement.sendKeys(password);
     }
 
     public void clickLoginButton() {
         driver.findElement(loginButton).click();
-    }
-
-    public boolean isLoginSuccessful() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(loginSuccessMessage));
-        WebElement successMessage = driver.findElement(loginSuccessMessage);
-        return successMessage.isDisplayed();
     }
 }
