@@ -1,11 +1,14 @@
-// File: testdata.json
 {
-  "defects": [
-    { "id": 101, "description": "Initial defect description" },
-    { "id": 102, "description": "Another defect description" },
-    { "id": 103, "description": "Critical defect description" }
-  ],
-  "searchTerms": {
-    "advancedSearch": "Critical"
+  "admin": {
+    "username": "admin_user",
+    "password": "Secure@5"
+  },
+  "user": {
+    "username": "user123",
+    "password": "Secure@5"
+  },
+  "guest": {
+    "username": "guest_user",
+    "password": "Secure@5"
   }
 }
