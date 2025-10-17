@@ -1,47 +1,29 @@
-package tests;
+package pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-import pages.LoginPage;
-import pages.WithdrawalPage;
-import utils.DriverManager;
-import utils.ConfigReader;
-import utils.TestDataReader;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class ATMTests {
+public class AccountDetailsPage {
     private WebDriver driver;
-    private LoginPage loginPage;
-    private WithdrawalPage withdrawalPage;
+    private WebDriverWait wait;
 
-    @BeforeMethod
-    public void setUp() {
-        driver = DriverManager.getDriver();
-        loginPage = new LoginPage(driver);
-        withdrawalPage = new WithdrawalPage(driver);
+    private By welcomeMessage = By.id("welcomeMessage");
+    private By balanceDisplay = By.id("balanceDisplay");
+
+    public AccountDetailsPage(WebDriver driver, int timeout) {
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, timeout);
     }
 
-    @AfterMethod
-    public void tearDown() {
-        DriverManager.quitDriver();
+    public void verifyWelcomeMessage(String expectedMessage) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(welcomeMessage));
+        assert driver.findElement(welcomeMessage).getText().contains(expectedMessage);
     }
 
-    @Test
-    public void testUserAuthentication() {
-        loginPage.navigateToLoginPage(ConfigReader.getConfigData("baseUrl"));
-        loginPage.enterUsername(TestDataReader.getTestData("login.username"));
-        loginPage.enterPassword(TestDataReader.getTestData("login.password"));
-        loginPage.clickLoginButton();
-        Assert.assertTrue(loginPage.isLoginSuccessful(), "Login was not successful");
-    }
-
-    @Test
-    public void testCashWithdrawal() {
-        withdrawalPage.navigateToWithdrawalPage(ConfigReader.getConfigData("baseUrl"));
-        withdrawalPage.enterWithdrawalAmount(TestDataReader.getTestData("withdrawal.amount"));
-        withdrawalPage.clickWithdrawalButton();
-        Assert.assertTrue(withdrawalPage.isWithdrawalSuccessful(), "Withdrawal was not successful");
+    public void verifyAccountDetails(String expectedBalance) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(balanceDisplay));
+        assert driver.findElement(balanceDisplay).getText().equals(expectedBalance);
     }
 }
