@@ -1,45 +1,28 @@
-// File: LoginTest.java
-package tests;
+package pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-import pages.LoginPage;
-import pages.DashboardPage;
-import utils.DriverManager;
-import utils.ConfigReader;
-import utils.TestDataReader;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class LoginTest {
+public class GuestInfoPage {
     private WebDriver driver;
-    private LoginPage loginPage;
-    private DashboardPage dashboardPage;
+    private WebDriverWait wait;
 
-    @BeforeMethod
-    public void setUp() {
-        driver = DriverManager.getDriver(ConfigReader.getConfigData("browser"));
-        loginPage = new LoginPage(driver);
-        dashboardPage = new DashboardPage(driver);
+    private By welcomeMessage = By.id("welcomeMessage");
+    private By infoPageHeader = By.id("infoPageHeader");
+
+    public GuestInfoPage(WebDriver driver, int timeout) {
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, timeout);
     }
 
-    @Test
-    public void testLogin() {
-        String baseUrl = ConfigReader.getConfigData("baseUrl");
-        String username = TestDataReader.getTestData("login.username");
-        String password = TestDataReader.getTestData("login.password");
-
-        loginPage.navigateToLoginPage(baseUrl);
-        loginPage.enterUsername(username);
-        loginPage.enterPassword(password);
-        loginPage.clickLoginButton();
-        loginPage.waitForDashboardPage();
+    public void verifyWelcomeMessage(String expectedMessage) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(welcomeMessage));
+        assert driver.findElement(welcomeMessage).getText().contains(expectedMessage);
     }
 
-    @AfterMethod
-    public void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
+    public void verifyGuestInfoPage() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(infoPageHeader));
     }
 }
