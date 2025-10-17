@@ -1,24 +1,18 @@
-// File: TestDataReader.java
 package utils;
 
 import org.json.JSONObject;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.io.IOException;
 
 public class TestDataReader {
-    private static JSONObject testData;
-
-    static {
+    public static JSONObject getTestData(String key) {
         try {
             String content = new String(Files.readAllBytes(Paths.get("config/testdata.json")));
-            testData = new JSONObject(content);
-        } catch (IOException e) {
+            JSONObject jsonObject = new JSONObject(content);
+            return jsonObject.getJSONObject(key);
+        } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-    }
-
-    public static String getTestData(String key) {
-        return testData.getJSONObject(key).toString();
     }
 }
