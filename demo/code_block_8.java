@@ -2,39 +2,27 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class WithdrawalPage {
+public class AdminDashboardPage {
     private WebDriver driver;
     private WebDriverWait wait;
 
-    private By withdrawalAmountField = By.id("withdrawalAmount");
-    private By withdrawalButton = By.id("withdrawalButton");
-    private By withdrawalSuccessMessage = By.id("withdrawalSuccessMessage");
+    private By welcomeMessage = By.id("welcomeMessage");
+    private By dashboardHeader = By.id("dashboardHeader");
 
-    public WithdrawalPage(WebDriver driver) {
+    public AdminDashboardPage(WebDriver driver, int timeout) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, 10);
+        this.wait = new WebDriverWait(driver, timeout);
     }
 
-    public void navigateToWithdrawalPage(String baseUrl) {
-        driver.get(baseUrl + "/withdrawal");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(withdrawalAmountField));
+    public void verifyWelcomeMessage(String expectedMessage) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(welcomeMessage));
+        assert driver.findElement(welcomeMessage).getText().contains(expectedMessage);
     }
 
-    public void enterWithdrawalAmount(String amount) {
-        driver.findElement(withdrawalAmountField).sendKeys(amount);
-    }
-
-    public void clickWithdrawalButton() {
-        driver.findElement(withdrawalButton).click();
-    }
-
-    public boolean isWithdrawalSuccessful() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(withdrawalSuccessMessage));
-        WebElement successMessage = driver.findElement(withdrawalSuccessMessage);
-        return successMessage.isDisplayed();
+    public void verifyDashboardPage() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(dashboardHeader));
     }
 }
